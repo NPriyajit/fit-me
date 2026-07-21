@@ -1,4 +1,115 @@
 export const POPULAR_PRESETS = [
+  // BEGINNER PRESETS
+  {
+    id: "preset-beginner-mobility",
+    name: "Gentle Full-Body Mobility",
+    description: "Gentle joints lubrication and stretch routine to improve range of motion.",
+    level: "beginner",
+    equipment: "bodyweight",
+    duration: 15,
+    exercises: [
+      { id: "wu-arm-circles", defaultSets: 1, defaultReps: 12, defaultDuration: 0 },
+      { id: "wu-cat-cow", defaultSets: 1, defaultReps: 10, defaultDuration: 0 },
+      { id: "cd-childs-pose", defaultSets: 1, defaultReps: 1, defaultDuration: 45 },
+      { id: "cd-hamstring-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
+    ]
+  },
+  {
+    id: "preset-beginner-cardio",
+    name: "Low-Impact Cardio Starter",
+    description: "Beginner-friendly bodyweight moves to get your heart rate up without joint stress.",
+    level: "beginner",
+    equipment: "bodyweight",
+    duration: 30,
+    exercises: [
+      { id: "wu-torso-twists", defaultSets: 1, defaultReps: 12, defaultDuration: 0 },
+      { id: "wu-calf-raises", defaultSets: 1, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-bodyweight-squat", defaultSets: 2, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-pushup", defaultSets: 2, defaultReps: 8, defaultDuration: 0 },
+      { id: "main-plank", defaultSets: 2, defaultReps: 1, defaultDuration: 30 },
+      { id: "cd-cobra", defaultSets: 1, defaultReps: 1, defaultDuration: 30 },
+      { id: "cd-quad-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
+    ]
+  },
+  {
+    id: "preset-beginner-dumbbell",
+    name: "Dumbbell Strength Intro",
+    description: "Learn key lifting patterns (squat, press, row) with light dumbbells.",
+    level: "beginner",
+    equipment: "dumbbell",
+    duration: 30,
+    exercises: [
+      { id: "wu-arm-circles", defaultSets: 1, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-goblet-squat", defaultSets: 2, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-db-floor-press", defaultSets: 2, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-db-row", defaultSets: 2, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-db-bicep-curl", defaultSets: 2, defaultReps: 10, defaultDuration: 0 },
+      { id: "cd-shoulder-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 },
+      { id: "cd-quad-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
+    ]
+  },
+
+  // INTERMEDIATE PRESETS
+  {
+    id: "preset-intermediate-bodyweight",
+    name: "Calisthenics Conditioning",
+    description: "Strength-endurance routine utilizing moderate bodyweight exercises.",
+    level: "intermediate",
+    equipment: "bodyweight",
+    duration: 30,
+    exercises: [
+      { id: "wu-inchworm", defaultSets: 1, defaultReps: 6, defaultDuration: 0 },
+      { id: "wu-torso-twists", defaultSets: 1, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-pullup", defaultSets: 3, defaultReps: 6, defaultDuration: 0 },
+      { id: "main-pushup", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-bodyweight-squat", defaultSets: 3, defaultReps: 15, defaultDuration: 0 },
+      { id: "main-tricep-dips", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-plank", defaultSets: 3, defaultReps: 1, defaultDuration: 45 },
+      { id: "cd-childs-pose", defaultSets: 1, defaultReps: 1, defaultDuration: 45 },
+      { id: "cd-shoulder-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
+    ]
+  },
+  {
+    id: "preset-db-hypertrophy",
+    name: "Dumbbell Hypertrophy",
+    description: "Complete full-body muscle building using only a pair of dumbbells.",
+    level: "intermediate",
+    equipment: "dumbbell",
+    duration: 45,
+    exercises: [
+      { id: "wu-arm-circles", defaultSets: 1, defaultReps: 15, defaultDuration: 0 },
+      { id: "wu-hip-openers", defaultSets: 1, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-goblet-squat", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-db-floor-press", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-db-row", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-db-shoulder-press", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-db-rdl", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-db-bicep-curl", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
+      { id: "cd-hamstring-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 },
+      { id: "cd-shoulder-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
+    ]
+  },
+  {
+    id: "preset-intermediate-gym",
+    name: "Classic Upper Body Split",
+    description: "Standard gym workout targeting chest, back, shoulders and arms.",
+    level: "intermediate",
+    equipment: "gym",
+    duration: 45,
+    exercises: [
+      { id: "wu-chest-openers", defaultSets: 1, defaultReps: 12, defaultDuration: 0 },
+      { id: "wu-scapular-slides", defaultSets: 1, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-bb-bench-press", defaultSets: 3, defaultReps: 8, defaultDuration: 0 },
+      { id: "main-lat-pulldown", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-db-shoulder-press", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
+      { id: "main-tricep-pushdown", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
+      { id: "main-db-bicep-curl", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
+      { id: "cd-doorway-chest", defaultSets: 1, defaultReps: 1, defaultDuration: 30 },
+      { id: "cd-triceps-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
+    ]
+  },
+
+  // ADVANCED PRESETS
   {
     id: "preset-arnold-split",
     name: "Arnold Split: Chest & Back",
@@ -57,26 +168,6 @@ export const POPULAR_PRESETS = [
       { id: "main-plank", defaultSets: 3, defaultReps: 1, defaultDuration: 60 },
       { id: "cd-cobra", defaultSets: 1, defaultReps: 1, defaultDuration: 40 },
       { id: "cd-quad-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
-    ]
-  },
-  {
-    id: "preset-db-hypertrophy",
-    name: "Dumbbell Hypertrophy",
-    description: "Complete full-body muscle building using only a pair of dumbbells.",
-    level: "intermediate",
-    equipment: "dumbbell",
-    duration: 45,
-    exercises: [
-      { id: "wu-arm-circles", defaultSets: 1, defaultReps: 15, defaultDuration: 0 },
-      { id: "wu-hip-openers", defaultSets: 1, defaultReps: 10, defaultDuration: 0 },
-      { id: "main-goblet-squat", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
-      { id: "main-db-floor-press", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
-      { id: "main-db-row", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
-      { id: "main-db-shoulder-press", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
-      { id: "main-db-rdl", defaultSets: 3, defaultReps: 10, defaultDuration: 0 },
-      { id: "main-db-bicep-curl", defaultSets: 3, defaultReps: 12, defaultDuration: 0 },
-      { id: "cd-hamstring-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 },
-      { id: "cd-shoulder-stretch", defaultSets: 1, defaultReps: 1, defaultDuration: 30 }
     ]
   },
   {

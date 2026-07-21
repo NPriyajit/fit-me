@@ -194,15 +194,37 @@ export default function App() {
   };
 
   const handleAddExerciseToRoutine = (exercise) => {
-    // Add default values for duration/sets if not present
     const item = {
       ...exercise,
       defaultSets: exercise.defaultSets || 3,
       defaultReps: exercise.defaultReps || 10,
       defaultDuration: exercise.defaultDuration || 0
     };
-    setRoutine([...routine, item]);
-    refreshCustomExercises(); // reload in case a custom workout was created
+
+    const category = item.category || "main";
+    const newRoutine = [...routine];
+
+    if (category === "warmup") {
+      // Insert after the last existing warmup (or at index 0 if none)
+      const lastWarmupIdx = newRoutine.reduce((acc, ex, i) => ex.category === "warmup" ? i : acc, -1);
+      newRoutine.splice(lastWarmupIdx + 1, 0, item);
+    } else if (category === "cooldown") {
+      // Always append at the very end
+      newRoutine.push(item);
+    } else {
+      // Main: insert after the last main exercise, before any cooldowns
+      const lastMainIdx = newRoutine.reduce((acc, ex, i) => ex.category === "main" ? i : acc, -1);
+      if (lastMainIdx !== -1) {
+        newRoutine.splice(lastMainIdx + 1, 0, item);
+      } else {
+        // No mains yet — insert after last warmup
+        const lastWarmupIdx = newRoutine.reduce((acc, ex, i) => ex.category === "warmup" ? i : acc, -1);
+        newRoutine.splice(lastWarmupIdx + 1, 0, item);
+      }
+    }
+
+    setRoutine(newRoutine);
+    refreshCustomExercises();
   };
 
   const handleViewVideo = (exercise) => {
@@ -253,17 +275,12 @@ export default function App() {
     return true;
   });
 
-  // Sort presets: match selected fitness level first, then closest duration
-  const filteredPresets = [...compatiblePresets].sort((a, b) => {
-    const aLevelMatch = a.level === preferences.level ? 1 : 0;
-    const bLevelMatch = b.level === preferences.level ? 1 : 0;
-    if (aLevelMatch !== bLevelMatch) {
-      return bLevelMatch - aLevelMatch;
-    }
-    const aDurDiff = Math.abs(a.duration - preferences.duration);
-    const bDurDiff = Math.abs(b.duration - preferences.duration);
-    return aDurDiff - bDurDiff;
-  });
+  // Filter by exact level match, sorted by closest duration
+  // Fallback: if nothing matches (e.g. no beginner gym presets) show all compatible
+  const levelMatchedPresets = compatiblePresets.filter(p => p.level === preferences.level);
+  const filteredPresets = (levelMatchedPresets.length > 0 ? levelMatchedPresets : compatiblePresets)
+    .slice()
+    .sort((a, b) => Math.abs(a.duration - preferences.duration) - Math.abs(b.duration - preferences.duration));
 
   // Full Screen Active Gym Player Mode
   if (activeWorkoutMode) {
@@ -389,10 +406,10 @@ export default function App() {
               </h3>
             </div>
             <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0 0 4px 0", lineHeight: "1.4" }}>
-              Instantly load expert-curated routines matching your equipment filter.
+              Expert-curated routines matched to your <strong style={{ color: "white" }}>{preferences.level}</strong> level &amp; equipment.
             </p>
             
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="preset-scroll" style={{ display: "flex", flexDirection: "column", gap: "10px", maxHeight: "340px", overflowY: "auto", overscrollBehavior: "contain", paddingRight: "4px" }}>
               {filteredPresets.map((preset) => (
                 <div 
                   key={preset.id}
@@ -414,15 +431,18 @@ export default function App() {
                     <h4 style={{ fontSize: "0.9rem", fontWeight: "600", color: "white", margin: 0 }}>
                       {preset.name}
                     </h4>
-                    <span className="badge" style={{ 
-                      fontSize: "0.65rem", 
-                      padding: "2px 6px", 
+                    <span className="badge" style={{
+                      fontSize: "0.65rem",
+                      padding: "2px 6px",
                       textTransform: "uppercase",
-                      backgroundColor: preset.level === "advanced" ? "rgba(139, 92, 246, 0.15)" : "rgba(0, 210, 255, 0.15)",
-                      color: preset.level === "advanced" ? "var(--accent-secondary)" : "var(--accent-blue)",
-                      border: preset.level === "advanced" ? "1px solid rgba(139, 92, 246, 0.3)" : "1px solid rgba(0, 210, 255, 0.3)",
                       borderRadius: "4px",
-                      fontWeight: "700"
+                      fontWeight: "700",
+                      ...(preset.level === "beginner"
+                        ? { backgroundColor: "rgba(0,255,136,0.12)", color: "var(--accent-neon)", border: "1px solid rgba(0,255,136,0.3)" }
+                        : preset.level === "intermediate"
+                        ? { backgroundColor: "rgba(0,210,255,0.12)", color: "var(--accent-blue)", border: "1px solid rgba(0,210,255,0.3)" }
+                        : { backgroundColor: "rgba(139,92,246,0.12)", color: "var(--accent-secondary)", border: "1px solid rgba(139,92,246,0.3)" }
+                      )
                     }}>
                       {preset.level}
                     </span>
