@@ -1650,13 +1650,17 @@ h1 {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Presets list scrollbar — matches global dark style */
-.preset-scroll::-webkit-scrollbar { width: 4px; }
-.preset-scroll::-webkit-scrollbar-track { background: transparent; }
-.preset-scroll::-webkit-scrollbar-thumb {
-  background: var(--surface);
+/* Presets horizontal carousel — hides scrollbar on mobile for clean swipe */
+.preset-carousel::-webkit-scrollbar { height: 3px; }
+.preset-carousel::-webkit-scrollbar-track { background: transparent; }
+.preset-carousel::-webkit-scrollbar-thumb {
+  background: var(--border-color);
   border-radius: 4px;
 }
-.preset-scroll::-webkit-scrollbar-thumb:hover {
+.preset-carousel::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+@media (max-width: 640px) {
+  .preset-carousel::-webkit-scrollbar { display: none; }
+  .preset-carousel { scrollbar-width: none; }
 }
