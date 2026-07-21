@@ -1,5 +1,15 @@
 import { getMergedLibrary } from "./store";
 
+// Helper to shuffle array for exercise variety
+const shuffleArray = (array) => {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
 export const generateRecommendation = ({ muscles, equipment, duration, level }) => {
   // 1. Combine default and custom exercises merged with overrides
   const allExercises = getMergedLibrary();
@@ -71,31 +81,33 @@ export const generateRecommendation = ({ muscles, equipment, duration, level }) 
 
   // 4. Filter and select Warmups
   const warmups = compatibleExercises.filter(ex => ex.category === "warmup");
-  // Sort to prioritize selected muscles
-  const prioritizedWarmups = [...warmups].sort((a, b) => {
-    const aMatch = targetMuscles.includes(a.target) ? 1 : 0;
-    const bMatch = targetMuscles.includes(b.target) ? 1 : 0;
-    return bMatch - aMatch;
-  });
-  const selectedWarmups = prioritizedWarmups.slice(0, warmupCount).map(adjustSetsReps);
+  // Filter warmups strictly to target muscles if specified
+  const allowedWarmups = muscles.length > 0
+    ? warmups.filter(ex => muscles.includes(ex.target))
+    : warmups;
+  const finalWarmups = allowedWarmups.length > 0 ? allowedWarmups : warmups;
+  const selectedWarmups = shuffleArray(finalWarmups).slice(0, warmupCount).map(adjustSetsReps);
 
   // 5. Filter and select Cooldowns
   const cooldowns = compatibleExercises.filter(ex => ex.category === "cooldown");
-  // Sort to prioritize selected muscles
-  const prioritizedCooldowns = [...cooldowns].sort((a, b) => {
-    const aMatch = targetMuscles.includes(a.target) ? 1 : 0;
-    const bMatch = targetMuscles.includes(b.target) ? 1 : 0;
-    return bMatch - aMatch;
-  });
-  const selectedCooldowns = prioritizedCooldowns.slice(0, cooldownCount).map(adjustSetsReps);
+  // Filter cooldowns strictly to target muscles if specified
+  const allowedCooldowns = muscles.length > 0
+    ? cooldowns.filter(ex => muscles.includes(ex.target))
+    : cooldowns;
+  const finalCooldowns = allowedCooldowns.length > 0 ? allowedCooldowns : cooldowns;
+  const selectedCooldowns = shuffleArray(finalCooldowns).slice(0, cooldownCount).map(adjustSetsReps);
 
   // 6. Filter and select Main Exercises
   const mainExercises = compatibleExercises.filter(ex => ex.category === "main");
+  // Strictly restrict main exercises to targeted muscle groups if specified
+  const allowedMains = muscles.length > 0
+    ? mainExercises.filter(ex => muscles.includes(ex.target))
+    : mainExercises;
   
   // Group main exercises by target muscle (only for selected/target muscles)
   const exercisesByMuscle = {};
   targetMuscles.forEach(m => {
-    exercisesByMuscle[m] = mainExercises.filter(ex => ex.target === m);
+    exercisesByMuscle[m] = shuffleArray(allowedMains.filter(ex => ex.target === m));
   });
 
   const selectedMains = [];
@@ -120,12 +132,13 @@ export const generateRecommendation = ({ muscles, equipment, duration, level }) 
     });
     
     if (!hasMore && !nextEx) {
-      // If we need more but ran out of targeted exercises, fill from remaining general mains
-      const remainingMains = mainExercises.filter(ex => !selectedMains.some(s => s.id === ex.id));
+      // If we need more but ran out of targeted exercises, fill from remaining allowed mains
+      const remainingMains = allowedMains.filter(ex => !selectedMains.some(s => s.id === ex.id));
       if (remainingMains.length > 0) {
-        selectedMains.push(adjustSetsReps(remainingMains[0]));
+        const shuffledRemaining = shuffleArray(remainingMains);
+        selectedMains.push(adjustSetsReps(shuffledRemaining[0]));
       } else {
-        break; // absolute run out of exercises
+        break; // absolute run out of allowed targeted exercises
       }
     }
     

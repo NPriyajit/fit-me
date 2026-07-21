@@ -14,14 +14,17 @@ import {
   saveHistory,
   getCustomExercises,
   deleteCustomExercise,
-  saveExerciseOverride
+  saveExerciseOverride,
+  getMergedLibrary
 } from "./utils/store";
 import { generateRecommendation } from "./utils/recommender";
+import { POPULAR_PRESETS } from "./data/presets";
 
 export default function App() {
   // Navigation & Screen states
   const [activeTab, setActiveTab] = useState("planner");
   const [activeWorkoutMode, setActiveWorkoutMode] = useState(false);
+  const [presetLoading, setPresetLoading] = useState(null);
 
   // Core Data state
   const [preferences, setPreferences] = useState(getPreferences());
@@ -82,6 +85,73 @@ export default function App() {
     const recommended = generateRecommendation(preferences);
     setRoutine(recommended);
     setActiveTab("routine");
+  };
+
+  const playSuccessSound = () => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.type = "sine";
+      
+      const now = ctx.currentTime;
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.08);
+      osc.frequency.setValueAtTime(783.99, now + 0.16);
+      
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      
+      osc.start();
+      osc.stop(now + 0.4);
+    } catch (e) {
+      console.error("Audio failed", e);
+    }
+  };
+
+  const handleLoadPreset = (preset) => {
+    setPresetLoading({ name: preset.name, success: false });
+    
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      osc.start(); osc.stop(ctx.currentTime + 0.08);
+    } catch (e) {}
+
+    setTimeout(() => {
+      setPresetLoading({ name: preset.name, success: true });
+      playSuccessSound();
+      
+      setTimeout(() => {
+        setPresetLoading(null);
+        
+        const library = getMergedLibrary();
+        const resolved = preset.exercises.map((pEx) => {
+          const match = library.find((ex) => ex.id === pEx.id);
+          if (!match) return null;
+          return {
+            ...match,
+            defaultSets: pEx.defaultSets !== undefined ? pEx.defaultSets : (match.defaultSets || 3),
+            defaultReps: pEx.defaultReps !== undefined ? pEx.defaultReps : (match.defaultReps || 10),
+            defaultDuration: pEx.defaultDuration !== undefined ? pEx.defaultDuration : (match.defaultDuration || 0)
+          };
+        }).filter(Boolean);
+
+        setRoutine(resolved);
+        setActiveTab("routine");
+      }, 700);
+    }, 600);
   };
 
   // Routine customization operations
@@ -172,6 +242,29 @@ export default function App() {
     });
   };
 
+  // Filter presets compatible with selected equipment
+  const compatiblePresets = POPULAR_PRESETS.filter(preset => {
+    if (preferences.equipment === "bodyweight") {
+      return preset.equipment === "bodyweight";
+    }
+    if (preferences.equipment === "dumbbell") {
+      return preset.equipment === "bodyweight" || preset.equipment === "dumbbell";
+    }
+    return true;
+  });
+
+  // Sort presets: match selected fitness level first, then closest duration
+  const filteredPresets = [...compatiblePresets].sort((a, b) => {
+    const aLevelMatch = a.level === preferences.level ? 1 : 0;
+    const bLevelMatch = b.level === preferences.level ? 1 : 0;
+    if (aLevelMatch !== bLevelMatch) {
+      return bLevelMatch - aLevelMatch;
+    }
+    const aDurDiff = Math.abs(a.duration - preferences.duration);
+    const bDurDiff = Math.abs(b.duration - preferences.duration);
+    return aDurDiff - bDurDiff;
+  });
+
   // Full Screen Active Gym Player Mode
   if (activeWorkoutMode) {
     return (
@@ -201,7 +294,8 @@ export default function App() {
         
         {/* TABS 1: PLANNER / PREFERENCES GENERATOR */}
         {activeTab === "planner" && (
-          <div className="preference-form">
+          <>
+            <div className="preference-form">
             <h2 className="screen-title">Workout Planner</h2>
             <p className="screen-desc">Enter your preferences to auto-generate a targeted stretch & strength routine.</p>
 
@@ -286,7 +380,80 @@ export default function App() {
               Generate Workout Recommendation
             </button>
           </div>
-        )}
+
+          <div className="preference-form" style={{ marginTop: "16px", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "1.2rem" }}>🔥</span>
+              <h3 style={{ fontSize: "1.05rem", fontWeight: "700", color: "white", letterSpacing: "-0.01em" }}>
+                Popular Workout Presets
+              </h3>
+            </div>
+            <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: "0 0 4px 0", lineHeight: "1.4" }}>
+              Instantly load expert-curated routines matching your equipment filter.
+            </p>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {filteredPresets.map((preset) => (
+                <div 
+                  key={preset.id}
+                  onClick={() => handleLoadPreset(preset)}
+                  style={{
+                    background: "rgba(9, 13, 22, 0.4)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "var(--border-radius-md)",
+                    padding: "12px 14px",
+                    cursor: "pointer",
+                    transition: "var(--transition-smooth)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "6px"
+                  }}
+                  className="preset-item-card"
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <h4 style={{ fontSize: "0.9rem", fontWeight: "600", color: "white", margin: 0 }}>
+                      {preset.name}
+                    </h4>
+                    <span className="badge" style={{ 
+                      fontSize: "0.65rem", 
+                      padding: "2px 6px", 
+                      textTransform: "uppercase",
+                      backgroundColor: preset.level === "advanced" ? "rgba(139, 92, 246, 0.15)" : "rgba(0, 210, 255, 0.15)",
+                      color: preset.level === "advanced" ? "var(--accent-secondary)" : "var(--accent-blue)",
+                      border: preset.level === "advanced" ? "1px solid rgba(139, 92, 246, 0.3)" : "1px solid rgba(0, 210, 255, 0.3)",
+                      borderRadius: "4px",
+                      fontWeight: "700"
+                    }}>
+                      {preset.level}
+                    </span>
+                  </div>
+                  
+                  <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: 0, lineHeight: "1.3" }}>
+                    {preset.description}
+                  </p>
+                  
+                  <div style={{ display: "flex", gap: "12px", fontSize: "0.7rem", fontWeight: "600", color: "var(--accent-neon)" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      ⏱️ {preset.duration} Min
+                    </span>
+                    <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      💪 {preset.exercises.length} Exercises
+                    </span>
+                    <span style={{ display: "flex", alignItems: "center", gap: "4px", textTransform: "capitalize" }}>
+                      🏋️ {preset.equipment === "gym" ? "Full Gym" : preset.equipment === "dumbbell" ? "Dumbbell" : "Bodyweight"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {filteredPresets.length === 0 && (
+                <div style={{ textAlign: "center", padding: "12px", color: "var(--text-muted)", fontSize: "0.8rem" }}>
+                  No presets match your current filters.
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
         {/* TABS 2: LIBRARY EXPLORER */}
         {activeTab === "library" && (
@@ -512,6 +679,66 @@ export default function App() {
             setVideoExercise(null);
           }}
         />
+      )}
+
+      {/* Preset Loading overlay */}
+      {presetLoading && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          maxWidth: "500px",
+          height: "100%",
+          background: "rgba(9, 13, 22, 0.9)",
+          zIndex: 9999,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "20px",
+          backdropFilter: "blur(8px)"
+        }}>
+          {!presetLoading.success ? (
+            <>
+              {/* Spinner */}
+              <div style={{
+                width: "45px",
+                height: "45px",
+                border: "4px solid rgba(255, 255, 255, 0.1)",
+                borderTopColor: "var(--accent-neon)",
+                borderRadius: "50%",
+                animation: "spin 0.8s linear infinite"
+              }}></div>
+              <p style={{ color: "white", fontSize: "0.95rem", fontWeight: "600" }}>
+                Generating {presetLoading.name}...
+              </p>
+            </>
+          ) : (
+            <>
+              {/* Success Checkmark */}
+              <div style={{
+                width: "55px",
+                height: "55px",
+                borderRadius: "50%",
+                backgroundColor: "rgba(0, 255, 136, 0.1)",
+                border: "2px solid var(--accent-neon)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                animation: "popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+              }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent-neon)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <p style={{ color: "white", fontSize: "1.05rem", fontWeight: "700" }}>
+                Workout Generated!
+              </p>
+            </>
+          )}
+        </div>
       )}
 
       {/* Mobile Sticky Navigation Tabs */}

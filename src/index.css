@@ -1628,3 +1628,24 @@ h1 {
   width: 16px;
   height: 16px;
 }
+
+.preset-item-card {
+  transition: var(--transition-smooth) !important;
+}
+
+.preset-item-card:hover {
+  border-color: var(--accent-neon) !important;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.15) !important;
+  transform: translateY(-2px);
+  background-color: rgba(9, 13, 22, 0.6) !important;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}

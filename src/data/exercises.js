@@ -72,6 +72,78 @@ export const DEFAULT_EXERCISES = [
     defaultDuration: 30,
     searchQuery: "active hip openers warmup"
   },
+  {
+    id: "wu-wrist-rolls",
+    name: "Wrist Rolls & Arm Pumps",
+    category: "warmup",
+    target: "Arms",
+    equipment: "bodyweight",
+    description: "Extend arms forward. Clench fists and roll wrists clockwise, then counter-clockwise. Pump fingers open and closed to warm up wrists and forearms.",
+    defaultSets: 1,
+    defaultReps: 15,
+    defaultDuration: 30,
+    searchQuery: "wrist rolls forearm warmup"
+  },
+  {
+    id: "wu-plank-to-down-dog",
+    name: "Plank to Downward Dog",
+    category: "warmup",
+    target: "Core",
+    equipment: "bodyweight",
+    description: "Start in a high plank position. Push your hips back and up into a downward dog posture, stretching your calves, hamstrings, and shoulders. Return to plank.",
+    defaultSets: 1,
+    defaultReps: 10,
+    defaultDuration: 40,
+    searchQuery: "plank to downward dog stretch"
+  },
+  {
+    id: "wu-torso-twists",
+    name: "Dynamic Torso Twists",
+    category: "warmup",
+    target: "Core",
+    equipment: "bodyweight",
+    description: "Stand with feet shoulder-width, elbows raised to chest. Smoothly rotate your torso side to side, letting your back heel pivot to release spinal tension.",
+    defaultSets: 1,
+    defaultReps: 15,
+    defaultDuration: 30,
+    searchQuery: "dynamic torso twists warmup"
+  },
+  {
+    id: "wu-scapular-slides",
+    name: "Scapular Wall Slides",
+    category: "warmup",
+    target: "Back",
+    equipment: "bodyweight",
+    description: "Stand with heels, upper back, and hands flat against a wall. Slide arms up and overhead, then squeeze elbows down, contracting the shoulder blades.",
+    defaultSets: 1,
+    defaultReps: 12,
+    defaultDuration: 35,
+    searchQuery: "scapular wall slides back stretch"
+  },
+  {
+    id: "wu-inchworm",
+    name: "Inchworm Walkouts",
+    category: "warmup",
+    target: "Back",
+    equipment: "bodyweight",
+    description: "Hinge at your hips to touch the floor. Walk your hands forward into a high plank, hold for 1 second, then walk your feet back up to your hands.",
+    defaultSets: 1,
+    defaultReps: 6,
+    defaultDuration: 45,
+    searchQuery: "inchworm walkout warmup"
+  },
+  {
+    id: "wu-calf-raises",
+    name: "Dynamic Calf Raises",
+    category: "warmup",
+    target: "Legs",
+    equipment: "bodyweight",
+    description: "Stand tall with feet hip-width. Smoothly press up onto the balls of your feet, hold briefly to contract calves, and lower down under control.",
+    defaultSets: 1,
+    defaultReps: 15,
+    defaultDuration: 30,
+    searchQuery: "dynamic calf raises warmup"
+  },
 
   // MAIN - CHEST
   {
@@ -87,6 +159,18 @@ export const DEFAULT_EXERCISES = [
     searchQuery: "proper push up form"
   },
   {
+    id: "main-decline-pushup",
+    name: "Decline Push-ups",
+    category: "main",
+    target: "Chest",
+    equipment: "bodyweight",
+    description: "Place your feet on an elevated surface (bench or chair) and hands on the floor. Lower chest to floor and press up. Targets upper chest.",
+    defaultSets: 3,
+    defaultReps: 10,
+    defaultDuration: 0,
+    searchQuery: "decline pushup form chest"
+  },
+  {
     id: "main-db-floor-press",
     name: "Dumbbell Floor Press",
     category: "main",
@@ -97,6 +181,18 @@ export const DEFAULT_EXERCISES = [
     defaultReps: 10,
     defaultDuration: 0,
     searchQuery: "dumbbell floor press form"
+  },
+  {
+    id: "main-db-incline-press",
+    name: "Incline Dumbbell Bench Press",
+    category: "main",
+    target: "Chest",
+    equipment: "dumbbell",
+    description: "Lie on an incline bench set to 30-45 degrees. Press dumbbells straight up from upper chest, lowering them slowly to shoulder height.",
+    defaultSets: 3,
+    defaultReps: 10,
+    defaultDuration: 0,
+    searchQuery: "incline dumbbell press form"
   },
   {
     id: "main-bb-bench-press",
@@ -172,6 +268,30 @@ export const DEFAULT_EXERCISES = [
     defaultDuration: 0,
     searchQuery: "seated cable row form"
   },
+  {
+    id: "main-bb-deadlift",
+    name: "Barbell Deadlift",
+    category: "main",
+    target: "Back",
+    equipment: "gym",
+    description: "Stand with feet mid-foot under barbell. Bend at hips and knees, grab bar. Keeping spine completely straight, push through feet to lift bar to hips.",
+    defaultSets: 4,
+    defaultReps: 5,
+    defaultDuration: 0,
+    searchQuery: "barbell deadlift form"
+  },
+  {
+    id: "main-bb-bentover-row",
+    name: "Bent-Over Barbell Row",
+    category: "main",
+    target: "Back",
+    equipment: "gym",
+    description: "Bend forward at hips at 45 degrees, back flat. Grip barbell, pull up to touch lower chest, squeezing shoulder blades at top.",
+    defaultSets: 3,
+    defaultReps: 8,
+    defaultDuration: 0,
+    searchQuery: "barbell bent over row form"
+  },
 
   // MAIN - SHOULDERS
   {
@@ -187,6 +307,18 @@ export const DEFAULT_EXERCISES = [
     searchQuery: "pike pushup form shoulders"
   },
   {
+    id: "main-handstand-pushup",
+    name: "Handstand Push-ups",
+    category: "main",
+    target: "Shoulders",
+    equipment: "bodyweight",
+    description: "Kick up into a handstand against a wall. Lower body slowly until head lightly touches floor, then press back up forcefully.",
+    defaultSets: 3,
+    defaultReps: 5,
+    defaultDuration: 0,
+    searchQuery: "handstand pushup form"
+  },
+  {
     id: "main-db-shoulder-press",
     name: "Dumbbell Shoulder Press",
     category: "main",
@@ -197,6 +329,18 @@ export const DEFAULT_EXERCISES = [
     defaultReps: 10,
     defaultDuration: 0,
     searchQuery: "dumbbell shoulder press form"
+  },
+  {
+    id: "main-arnold-press",
+    name: "Dumbbell Arnold Press",
+    category: "main",
+    target: "Shoulders",
+    equipment: "dumbbell",
+    description: "Sit holding dumbbells at shoulder level, palms facing you. Rotate hands out as you press weights up, ending with palms facing away.",
+    defaultSets: 3,
+    defaultReps: 10,
+    defaultDuration: 0,
+    searchQuery: "dumbbell arnold press form"
   },
   {
     id: "main-db-lateral-raise",
@@ -237,6 +381,18 @@ export const DEFAULT_EXERCISES = [
     searchQuery: "proper air squat form"
   },
   {
+    id: "main-pistol-squat",
+    name: "Pistol Squats (Single Leg)",
+    category: "main",
+    target: "Legs",
+    equipment: "bodyweight",
+    description: "Stand on one leg, extend the other forward. Lower hips down deep into a single-leg squat, keeping heel flat, then stand up.",
+    defaultSets: 3,
+    defaultReps: 6,
+    defaultDuration: 0,
+    searchQuery: "pistol squat single leg form"
+  },
+  {
     id: "main-goblet-squat",
     name: "Dumbbell Goblet Squat",
     category: "main",
@@ -247,6 +403,18 @@ export const DEFAULT_EXERCISES = [
     defaultReps: 12,
     defaultDuration: 0,
     searchQuery: "dumbbell goblet squat form"
+  },
+  {
+    id: "main-db-bulgarian-split",
+    name: "Bulgarian Split Squat",
+    category: "main",
+    target: "Legs",
+    equipment: "dumbbell",
+    description: "Stand facing away from bench. Elevate rear foot on bench. Hold dumbbells, lower hips until back knee is near floor, drive up through front heel.",
+    defaultSets: 3,
+    defaultReps: 10,
+    defaultDuration: 0,
+    searchQuery: "bulgarian split squat form"
   },
   {
     id: "main-barbell-squat",
@@ -299,6 +467,30 @@ export const DEFAULT_EXERCISES = [
     searchQuery: "bench dips triceps form"
   },
   {
+    id: "main-diamond-pushup",
+    name: "Diamond Push-ups",
+    category: "main",
+    target: "Arms",
+    equipment: "bodyweight",
+    description: "Place hands close under chest, index fingers and thumbs forming a diamond. Lower chest to hands, keep elbows tucked, and press up.",
+    defaultSets: 3,
+    defaultReps: 10,
+    defaultDuration: 0,
+    searchQuery: "diamond pushups form triceps"
+  },
+  {
+    id: "main-chinup",
+    name: "Chin-ups",
+    category: "main",
+    target: "Arms",
+    equipment: "bodyweight",
+    description: "Grip pullup bar underhand (palms facing you). Pull body up until chin clears the bar, focusing on bicep and upper back squeeze.",
+    defaultSets: 3,
+    defaultReps: 8,
+    defaultDuration: 0,
+    searchQuery: "underhand chin up form biceps"
+  },
+  {
     id: "main-db-bicep-curl",
     name: "Dumbbell Bicep Curls",
     category: "main",
@@ -345,7 +537,7 @@ export const DEFAULT_EXERCISES = [
     description: "Rest on elbows and toes. Body must form straight line from head to heels. Engage abs and glutes, hold position.",
     defaultSets: 3,
     defaultReps: 1,
-    defaultDuration: 45, // seconds
+    defaultDuration: 45,
     searchQuery: "proper forearm plank form"
   },
   {
@@ -361,6 +553,18 @@ export const DEFAULT_EXERCISES = [
     searchQuery: "bodyweight russian twist form"
   },
   {
+    id: "main-ab-rollout",
+    name: "Ab Wheel Rollouts",
+    category: "main",
+    target: "Core",
+    equipment: "gym",
+    description: "Kneel on floor holding an ab wheel. Keeping core braced and back straight, roll forward as far as possible, then pull back to start.",
+    defaultSets: 3,
+    defaultReps: 10,
+    defaultDuration: 0,
+    searchQuery: "ab wheel rollout core form"
+  },
+  {
     id: "main-hanging-leg-raise",
     name: "Hanging Knee/Leg Raises",
     category: "main",
@@ -371,6 +575,18 @@ export const DEFAULT_EXERCISES = [
     defaultReps: 10,
     defaultDuration: 0,
     searchQuery: "hanging leg raise form core"
+  },
+  {
+    id: "main-toes-to-bar",
+    name: "Toes-to-Bar",
+    category: "main",
+    target: "Core",
+    equipment: "gym",
+    description: "Hang from pullup bar. Pull shoulders down, swing legs up in a controlled kip, and tap your toes against the bar before controlled descent.",
+    defaultSets: 3,
+    defaultReps: 8,
+    defaultDuration: 0,
+    searchQuery: "gymnastics toes to bar form"
   },
 
   // COOLDOWNS / POST-STRETCHES
@@ -445,6 +661,78 @@ export const DEFAULT_EXERCISES = [
     defaultReps: 1,
     defaultDuration: 30,
     searchQuery: "cross arm shoulder stretch"
+  },
+  {
+    id: "cd-wrist-stretch",
+    name: "Kneeling Forearm & Wrist Stretch",
+    category: "cooldown",
+    target: "Arms",
+    equipment: "bodyweight",
+    description: "Kneel on the floor. Place hands flat with fingers pointing backward towards your knees. Gently lean back to stretch forearms and wrist flexors.",
+    defaultSets: 1,
+    defaultReps: 1,
+    defaultDuration: 30,
+    searchQuery: "kneeling wrist forearm stretch"
+  },
+  {
+    id: "cd-triceps-stretch",
+    name: "Overhead Tricep Stretch",
+    category: "cooldown",
+    target: "Arms",
+    equipment: "bodyweight",
+    description: "Bring one arm overhead and reach your hand down your spine. Grab your active elbow with the opposite hand and gently press down to stretch triceps.",
+    defaultSets: 1,
+    defaultReps: 1,
+    defaultDuration: 30,
+    searchQuery: "overhead tricep stretch"
+  },
+  {
+    id: "cd-lying-twist",
+    name: "Lying Spinal Twist",
+    category: "cooldown",
+    target: "Core",
+    equipment: "bodyweight",
+    description: "Lie flat on your back. Pull one knee up to your chest, then gently drape it across your body to the opposite side, keeping shoulders flat on floor.",
+    defaultSets: 1,
+    defaultReps: 1,
+    defaultDuration: 40,
+    searchQuery: "lying spinal twist stretch"
+  },
+  {
+    id: "cd-butterfly",
+    name: "Butterfly Hips Stretch",
+    category: "cooldown",
+    target: "Legs",
+    equipment: "bodyweight",
+    description: "Sit on the floor, bend your knees, and press the soles of your feet together. Hold your feet and gently lower your knees to the ground to stretch hips.",
+    defaultSets: 1,
+    defaultReps: 1,
+    defaultDuration: 40,
+    searchQuery: "butterfly groin stretch"
+  },
+  {
+    id: "cd-hip-flexor",
+    name: "Kneeling Hip Flexor Stretch",
+    category: "cooldown",
+    target: "Legs",
+    equipment: "bodyweight",
+    description: "Step one foot forward in a lunge, and rest back knee on floor. Tighten glutes and gently push your hips forward while keeping chest up.",
+    defaultSets: 1,
+    defaultReps: 1,
+    defaultDuration: 30,
+    searchQuery: "kneeling hip flexor stretch"
+  },
+  {
+    id: "cd-upper-trap",
+    name: "Neck & Upper Trap Stretch",
+    category: "cooldown",
+    target: "Shoulders",
+    equipment: "bodyweight",
+    description: "Stand or sit tall. Relax your shoulders. Gently guide your right ear towards your right shoulder, holding with light hand weight. Switch sides.",
+    defaultSets: 1,
+    defaultReps: 1,
+    defaultDuration: 30,
+    searchQuery: "neck upper trap stretch"
   }
 ];
 
