@@ -783,6 +783,97 @@ export default function App() {
         </div>
       )}
 
+      {/* Creator Footer */}
+      <footer style={{
+        padding: "18px 20px 90px", // 90px bottom padding clears the sticky BottomNav
+        textAlign: "center",
+        borderTop: "1px solid var(--border-color)",
+        marginTop: "8px"
+      }}>
+        <p style={{ margin: "0 0 6px 0", fontSize: "0.7rem", color: "var(--text-muted)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          Crafted with 💪 by - Priyajit
+        </p>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap" }}>
+          {/* LinkedIn */}
+          <a
+            href="https://www.linkedin.com/in/n-priyajit/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "7px",
+              textDecoration: "none",
+              padding: "6px 14px",
+              borderRadius: "999px",
+              border: "1px solid rgba(0, 119, 181, 0.4)",
+              background: "rgba(0, 119, 181, 0.08)",
+              transition: "var(--transition-smooth)"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = "rgba(0, 119, 181, 0.18)";
+              e.currentTarget.style.borderColor = "rgba(0, 119, 181, 0.7)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = "rgba(0, 119, 181, 0.08)";
+              e.currentTarget.style.borderColor = "rgba(0, 119, 181, 0.4)";
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#0077B5">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+            </svg>
+            <span style={{ fontSize: "0.82rem", fontWeight: "700", color: "#60b8e0", letterSpacing: "0.01em" }}>
+              LinkedIn
+            </span>
+          </a>
+
+          {/* Instagram */}
+          <a
+            href="https://www.instagram.com/_npriyajit/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "7px",
+              textDecoration: "none",
+              padding: "6px 14px",
+              borderRadius: "999px",
+              border: "1px solid rgba(225, 48, 108, 0.4)",
+              background: "rgba(225, 48, 108, 0.08)",
+              transition: "var(--transition-smooth)"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = "rgba(225, 48, 108, 0.18)";
+              e.currentTarget.style.borderColor = "rgba(225, 48, 108, 0.7)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = "rgba(225, 48, 108, 0.08)";
+              e.currentTarget.style.borderColor = "rgba(225, 48, 108, 0.4)";
+            }}
+          >
+            {/* Instagram gradient icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="url(#ig-grad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <defs>
+                <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#f09433" />
+                  <stop offset="25%" stopColor="#e6683c" />
+                  <stop offset="50%" stopColor="#dc2743" />
+                  <stop offset="75%" stopColor="#cc2366" />
+                  <stop offset="100%" stopColor="#bc1888" />
+                </linearGradient>
+              </defs>
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="0.5" fill="url(#ig-grad)" stroke="none" />
+            </svg>
+            <span style={{ fontSize: "0.82rem", fontWeight: "700", color: "#e1306c", letterSpacing: "0.01em" }}>
+              Instagram
+            </span>
+          </a>
+        </div>
+      </footer>
+
       {/* Mobile Sticky Navigation Tabs */}
       <BottomNav
         activeTab={activeTab}
