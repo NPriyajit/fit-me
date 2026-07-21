@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { DEFAULT_EXERCISES, MUSCLE_GROUPS } from "../data/exercises";
-import { getCustomExercises, addCustomExercise } from "../utils/store";
+import { MUSCLE_GROUPS } from "../data/exercises";
+import { addCustomExercise, getMergedLibrary } from "../utils/store";
 
 export default function ExerciseModal({
   mode, // 'add' (library list) or 'edit' (edit single workout parameters) or 'create'
@@ -8,6 +8,8 @@ export default function ExerciseModal({
   onClose,
   onSave, // callback for editing
   onAddExercise, // callback for adding an exercise from the library
+  isFlat = false,
+  onEditExercise = null
 }) {
   // Active states
   const [activeSubMode, setActiveSubMode] = useState(mode); // 'add' or 'create'
@@ -51,8 +53,8 @@ export default function ExerciseModal({
     }
   }, [mode, exerciseToEdit]);
 
-  // Combine default library with user custom exercises
-  const library = [...DEFAULT_EXERCISES, ...getCustomExercises()];
+  // Combine default library with user custom exercises merged with overrides
+  const library = getMergedLibrary();
 
   // Filter library exercises
   const filteredLibrary = library.filter((ex) => {
@@ -92,6 +94,92 @@ export default function ExerciseModal({
     onClose();
   };
 
+  if (isFlat) {
+    return (
+      <div className="library-mode-flat">
+        {/* Filter controls */}
+        <div className="filters-grid">
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search exercise..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="form-input search-input"
+            />
+          </div>
+          
+          <div className="filter-selects">
+            <select 
+              value={filterMuscle} 
+              onChange={(e) => setFilterMuscle(e.target.value)}
+              className="form-input filter-dropdown"
+            >
+              <option value="">All Muscles</option>
+              {MUSCLE_GROUPS.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+
+            <select 
+              value={filterCategory} 
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="form-input filter-dropdown"
+            >
+              <option value="">All Types</option>
+              <option value="warmup">Warmup</option>
+              <option value="main">Main Lift</option>
+              <option value="cooldown">Cooldown</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Exercises list */}
+        <div className="library-list-container flat-library-list">
+          {filteredLibrary.length > 0 ? (
+            filteredLibrary.map((ex) => (
+              <div key={ex.id} className="library-item-card">
+                <div className="item-details">
+                  <h4>{ex.name}</h4>
+                  <div className="item-badges">
+                    <span className={`badge badge-${ex.category}`}>{ex.category.toUpperCase()}</span>
+                    <span className="badge badge-muscle">{ex.target}</span>
+                    {ex.isCustom && <span className="badge badge-custom">CUSTOM</span>}
+                  </div>
+                  <p className="item-desc">{ex.description}</p>
+                </div>
+                <div className="library-item-actions">
+                  {onEditExercise && (
+                    <button
+                      className="btn btn-secondary edit-item-btn"
+                      onClick={() => onEditExercise(ex)}
+                      title="Edit exercise details"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-primary add-item-btn"
+                    onClick={() => {
+                      onAddExercise(ex);
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-results-msg">No exercises match your filter criteria.</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content main-modal" onClick={(e) => e.stopPropagation()}>
@@ -105,7 +193,7 @@ export default function ExerciseModal({
         </div>
 
         {/* Sub-navigation for switching between Library and Create custom (only in non-edit mode) */}
-        {mode !== "edit" && (
+        {mode !== "edit" && mode !== "create" && (
           <div className="modal-tabs">
             <button 
               className={`modal-tab-btn ${activeSubMode === "add" ? "active" : ""}`}
@@ -177,15 +265,29 @@ export default function ExerciseModal({
                         </div>
                         <p className="item-desc">{ex.description}</p>
                       </div>
-                      <button
-                        className="btn btn-primary add-item-btn"
-                        onClick={() => {
-                          onAddExercise(ex);
-                          onClose();
-                        }}
-                      >
-                        Add
-                      </button>
+                      <div className="library-item-actions">
+                        {onEditExercise && (
+                          <button
+                            className="btn btn-secondary edit-item-btn"
+                            onClick={() => onEditExercise(ex)}
+                            title="Edit exercise details"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                          </button>
+                        )}
+                        <button
+                          className="btn btn-primary add-item-btn"
+                          onClick={() => {
+                            onAddExercise(ex);
+                            onClose();
+                          }}
+                        >
+                          Add
+                        </button>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -286,14 +388,51 @@ export default function ExerciseModal({
 
               <div className="form-group">
                 <label className="form-label">Media Reference URL (Optional)</label>
-                <input
-                  type="url"
-                  placeholder="e.g. YouTube Video, Short, or GIF link"
-                  value={formVideoUrl}
-                  onChange={(e) => setFormVideoUrl(e.target.value)}
-                  className="form-input"
-                />
-                <small className="help-text">Supports YouTube links, Shorts, or direct GIF URLs.</small>
+                <div className="input-with-icon-wrapper">
+                  <input
+                    type="url"
+                    placeholder="e.g. YouTube Video, Short, or GIF link"
+                    value={formVideoUrl}
+                    onChange={(e) => setFormVideoUrl(e.target.value)}
+                    className="form-input input-with-icon"
+                  />
+                  {formVideoUrl ? (
+                    <button
+                      type="button"
+                      className="input-play-btn"
+                      onClick={() => window.open(formVideoUrl, "_blank")}
+                      title="Open and verify the entered media URL in a new tab"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="video-play-svg">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="input-sparkle-btn"
+                      onClick={() => {
+                        const query = formName.trim() ? `how to do ${formName.trim()} exercise form guide` : "gym exercise guide";
+                        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, "_blank");
+                      }}
+                      title="AI Dynamic Search: Lookup video guides on YouTube for this workout"
+                      disabled={!formName.trim()}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="sparkle-svg">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                        <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"></path>
+                        <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"></path>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                <small className="help-text">
+                  {formVideoUrl
+                    ? "Tap the Play icon on the right to open and verify the entered media URL."
+                    : !formName.trim()
+                    ? "Enter an exercise name above to enable the AI Sparkle search lookup helper."
+                    : "Tap the AI Sparkle sparkles icon on the right to search YouTube for this form guide."}
+                </small>
               </div>
 
               <div className="form-group">

@@ -1,10 +1,8 @@
-import { DEFAULT_EXERCISES } from "../data/exercises";
-import { getCustomExercises } from "./store";
+import { getMergedLibrary } from "./store";
 
 export const generateRecommendation = ({ muscles, equipment, duration, level }) => {
-  // 1. Combine default and custom exercises
-  const customList = getCustomExercises();
-  const allExercises = [...DEFAULT_EXERCISES, ...customList];
+  // 1. Combine default and custom exercises merged with overrides
+  const allExercises = getMergedLibrary();
 
   // 2. Filter by equipment compatibility
   const isCompatible = (exEquipment) => {

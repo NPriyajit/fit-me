@@ -13,7 +13,8 @@ import {
   getHistory,
   saveHistory,
   getCustomExercises,
-  deleteCustomExercise
+  deleteCustomExercise,
+  saveExerciseOverride
 } from "./utils/store";
 import { generateRecommendation } from "./utils/recommender";
 
@@ -102,9 +103,24 @@ export default function App() {
   };
 
   const handleSaveEditedExercise = (updated) => {
-    const newRoutine = [...routine];
-    newRoutine[exerciseToEditIndex] = updated;
-    setRoutine(newRoutine);
+    // Save to global exercises overrides so it connects to parent exercise permanently
+    saveExerciseOverride(updated.id, {
+      videoUrl: updated.videoUrl,
+      description: updated.description,
+      defaultSets: updated.defaultSets,
+      defaultReps: updated.defaultReps,
+      defaultDuration: updated.defaultDuration
+    });
+
+    if (exerciseToEditIndex !== null) {
+      const newRoutine = [...routine];
+      newRoutine[exerciseToEditIndex] = updated;
+      setRoutine(newRoutine);
+    } else {
+      // Sync edits to all existing instances in the active routine
+      const newRoutine = routine.map(ex => ex.id === updated.id ? { ...ex, ...updated } : ex);
+      setRoutine(newRoutine);
+    }
   };
 
   const handleAddExerciseToRoutine = (exercise) => {
@@ -298,8 +314,9 @@ export default function App() {
               {/* Trigger the search modal but keep it open directly */}
               <ExerciseModal
                 mode="add"
-                onClose={() => {}}
+                isFlat={true}
                 onAddExercise={handleAddExerciseToRoutine}
+                onEditExercise={(ex) => handleEditExercise(ex, null)}
               />
             </div>
           </div>
@@ -478,6 +495,11 @@ export default function App() {
           }}
           onSave={handleSaveEditedExercise}
           onAddExercise={handleAddExerciseToRoutine}
+          onEditExercise={(ex) => {
+            setExerciseToEdit(ex);
+            setExerciseToEditIndex(null);
+            setModalMode("edit");
+          }}
         />
       )}
 

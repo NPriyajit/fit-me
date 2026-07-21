@@ -1,8 +1,11 @@
+import { DEFAULT_EXERCISES } from "../data/exercises";
+
 const KEYS = {
   PREFERENCES: "fitme_preferences",
   CUSTOM_EXERCISES: "fitme_custom_exercises",
   CURRENT_ROUTINE: "fitme_current_routine",
-  HISTORY: "fitme_history"
+  HISTORY: "fitme_history",
+  OVERRIDES: "fitme_exercise_overrides"
 };
 
 export const getPreferences = () => {
@@ -92,4 +95,34 @@ export const logCompletedWorkout = (routine, durationSeconds) => {
   history.unshift(logEntry);
   saveHistory(history);
   return logEntry;
+};
+
+export const getExerciseOverrides = () => {
+  const data = localStorage.getItem(KEYS.OVERRIDES);
+  return data ? JSON.parse(data) : {};
+};
+
+export const saveExerciseOverride = (id, fields) => {
+  const overrides = getExerciseOverrides();
+  overrides[id] = {
+    ...(overrides[id] || {}),
+    ...fields
+  };
+  localStorage.setItem(KEYS.OVERRIDES, JSON.stringify(overrides));
+};
+
+export const getMergedLibrary = () => {
+  const custom = getCustomExercises();
+  const overrides = getExerciseOverrides();
+
+  const merge = (ex) => {
+    if (overrides[ex.id]) {
+      return { ...ex, ...overrides[ex.id] };
+    }
+    return ex;
+  };
+
+  const mergedDefaults = DEFAULT_EXERCISES.map(merge);
+  const mergedCustoms = custom.map(merge);
+  return [...mergedDefaults, ...mergedCustoms];
 };
