@@ -1,0 +1,24 @@
+{
+  "name": "FitMe Gym Companion",
+  "short_name": "FitMe",
+  "description": "Premium workouts recommendations, presets, and live gym workout companion.",
+  "start_url": "/fit-me/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
