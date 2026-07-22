@@ -29,6 +29,7 @@ export default function App() {
   // Core Data state
   const [preferences, setPreferences] = useState(getPreferences());
   const [routine, setRoutine] = useState(getCurrentRoutine());
+  const [routineName, setRoutineName] = useState(() => localStorage.getItem("fitme_routine_name") || "Custom Workout");
   const [history, setHistory] = useState(getHistory());
   const [customExercises, setCustomExercises] = useState(getCustomExercises());
 
@@ -40,10 +41,16 @@ export default function App() {
 
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [videoExercise, setVideoExercise] = useState(null);
+  const [selectedHistoryLog, setSelectedHistoryLog] = useState(null);
 
   // In-app tap-to-confirm states
   const [confirmClearHistory, setConfirmClearHistory] = useState(false);
   const [confirmClearRoutine, setConfirmClearRoutine] = useState(false);
+
+  // Sync state to local storage when changed
+  useEffect(() => {
+    localStorage.setItem("fitme_routine_name", routineName);
+  }, [routineName]);
 
 
   // Sync state to local storage when changed
@@ -83,6 +90,8 @@ export default function App() {
   // Recommendation engine trigger
   const handleGenerateWorkout = () => {
     const recommended = generateRecommendation(preferences);
+    const name = preferences.muscles.length > 0 ? `${preferences.muscles.join(" & ")} Workout` : "Full Body Workout";
+    setRoutineName(name);
     setRoutine(recommended);
     setActiveTab("routine");
   };
@@ -148,6 +157,7 @@ export default function App() {
           };
         }).filter(Boolean);
 
+        setRoutineName(preset.name);
         setRoutine(resolved);
         setActiveTab("routine");
       }, 700);
@@ -156,6 +166,7 @@ export default function App() {
 
   // Routine customization operations
   const handleClearRoutine = () => {
+    setRoutineName("Custom Workout");
     setRoutine([]);
   };
 
@@ -232,6 +243,15 @@ export default function App() {
     setShowVideoPlayer(true);
   };
 
+  const handleSaveVideo = (exerciseId, videoUrl) => {
+    saveExerciseOverride(exerciseId, { videoUrl });
+    const newRoutine = routine.map(ex => ex.id === exerciseId ? { ...ex, videoUrl } : ex);
+    setRoutine(newRoutine);
+    if (videoExercise && videoExercise.id === exerciseId) {
+      setVideoExercise({ ...videoExercise, videoUrl });
+    }
+  };
+
   const handleClearHistory = () => {
     saveHistory([]);
     setHistory([]);
@@ -264,6 +284,44 @@ export default function App() {
     });
   };
 
+  const getFriendlyDate = (isoString) => {
+    const date = new Date(isoString);
+    const now = new Date();
+    
+    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    
+    const diffTime = todayDate - compareDate;
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    
+    const timeString = date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+    
+    if (diffDays === 0) {
+      return `Today at ${timeString}`;
+    } else if (diffDays === 1) {
+      return `Yesterday at ${timeString}`;
+    }
+    
+    const getOrdinalSuffix = (d) => {
+      if (d > 3 && d < 21) return "th";
+      switch (d % 10) {
+        case 1:  return "st";
+        case 2:  return "nd";
+        case 3:  return "rd";
+        default: return "th";
+      }
+    };
+    
+    const day = date.getDate();
+    const month = date.toLocaleDateString("en-US", { month: "short" });
+    const year = date.getFullYear() !== now.getFullYear() ? `, ${date.getFullYear()}` : "";
+    
+    return `${day}${getOrdinalSuffix(day)} ${month}${year} at ${timeString}`;
+  };
+
   // Filter presets compatible with selected equipment
   const compatiblePresets = POPULAR_PRESETS.filter(preset => {
     if (preferences.equipment === "bodyweight") {
@@ -287,6 +345,8 @@ export default function App() {
     return (
       <ActiveWorkout
         routine={routine}
+        setRoutine={setRoutine}
+        routineName={routineName}
         onExit={handleExitWorkout}
         onFinish={handleFinishWorkout}
       />
@@ -494,6 +554,96 @@ export default function App() {
                 </p>
               )}
             </div>
+            {/* Creator Footer - Home screen only */}
+            <footer style={{
+              padding: "24px 20px 40px",
+              textAlign: "center",
+              borderTop: "1px solid var(--border-color)",
+              marginTop: "24px"
+            }}>
+              <p style={{ margin: "0 0 8px 0", fontSize: "0.7rem", color: "var(--text-muted)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                Crafted with 💪 by - Priyajit
+              </p>
+              <div style={{ display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap" }}>
+                {/* LinkedIn */}
+                <a
+                  href="https://www.linkedin.com/in/n-priyajit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    textDecoration: "none",
+                    padding: "6px 14px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(0, 119, 181, 0.4)",
+                    background: "rgba(0, 119, 181, 0.08)",
+                    transition: "var(--transition-smooth)"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = "rgba(0, 119, 181, 0.18)";
+                    e.currentTarget.style.borderColor = "rgba(0, 119, 181, 0.7)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = "rgba(0, 119, 181, 0.08)";
+                    e.currentTarget.style.borderColor = "rgba(0, 119, 181, 0.4)";
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#0077B5">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                  <span style={{ fontSize: "0.82rem", fontWeight: "700", color: "#60b8e0", letterSpacing: "0.01em" }}>
+                    LinkedIn
+                  </span>
+                </a>
+
+                {/* Instagram */}
+                <a
+                  href="https://www.instagram.com/_npriyajit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    textDecoration: "none",
+                    padding: "6px 14px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(225, 48, 108, 0.4)",
+                    background: "rgba(225, 48, 108, 0.08)",
+                    transition: "var(--transition-smooth)"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = "rgba(225, 48, 108, 0.18)";
+                    e.currentTarget.style.borderColor = "rgba(225, 48, 108, 0.7)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = "rgba(225, 48, 108, 0.08)";
+                    e.currentTarget.style.borderColor = "rgba(225, 48, 108, 0.4)";
+                  }}
+                >
+                  {/* Instagram gradient icon */}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="url(#ig-grad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <defs>
+                      <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#f09433" />
+                        <stop offset="25%" stopColor="#e6683c" />
+                        <stop offset="50%" stopColor="#dc2743" />
+                        <stop offset="75%" stopColor="#cc2366" />
+                        <stop offset="100%" stopColor="#bc1888" />
+                      </linearGradient>
+                    </defs>
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="0.5" fill="url(#ig-grad)" stroke="none" />
+                  </svg>
+                  <span style={{ fontSize: "0.82rem", fontWeight: "700", color: "#e1306c", letterSpacing: "0.01em" }}>
+                    Instagram
+                  </span>
+                </a>
+              </div>
+            </footer>
           </>
         )}
 
@@ -648,30 +798,40 @@ export default function App() {
               )}
             </div>
 
-            <div className="history-list">
+            <div className="history-list" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {history.length > 0 ? (
                 history.map((log) => {
                   const durationMins = Math.round(log.duration / 60);
                   return (
-                    <div key={log.id} className="history-card">
-                      <div className="history-card-header">
-                        <span className="history-date">{formatDate(log.date)}</span>
-                        <span className="history-duration">⏱️ {durationMins} min</span>
+                    <div 
+                      key={log.id} 
+                      className="history-card" 
+                      onClick={() => setSelectedHistoryLog(log)}
+                      style={{ 
+                        cursor: "pointer", 
+                        transition: "all 0.2s",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        padding: "16px",
+                        position: "relative"
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px" }}>
+                        <span style={{ fontSize: "1.02rem", fontWeight: "800", color: "white" }}>
+                          {log.workoutName || "Custom Workout"}
+                        </span>
+                        <span style={{ color: "var(--accent-neon)", fontSize: "0.82rem", fontWeight: "700" }}>
+                          🔥 {log.calories !== undefined ? log.calories : Math.round(durationMins * 6.5)} kcal
+                        </span>
                       </div>
-
-                      <div className="history-card-details">
-                        <span>💪 {log.exerciseCount} Exercises Completed</span>
-                      </div>
-
-                      <div className="history-exercises-list">
-                        {log.exercises && log.exercises.map((ex, idx) => (
-                          <div key={idx} className="history-exercise-row">
-                            <span className="history-ex-name">{ex.name}</span>
-                            <span className="history-ex-vol">
-                              {ex.duration > 0 ? `${ex.sets} sets x ${ex.duration}s` : `${ex.sets} sets x ${ex.reps} reps`}
-                            </span>
-                          </div>
-                        ))}
+                      
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75rem", color: "var(--text-muted)", flexWrap: "wrap", gap: "6px" }}>
+                        <span>📅 {getFriendlyDate(log.date)}</span>
+                        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                          <span>⏱️ {durationMins} min</span>
+                          <span>💪 {log.exerciseCount} Exercises</span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -720,7 +880,104 @@ export default function App() {
             setShowVideoPlayer(false);
             setVideoExercise(null);
           }}
+          onSaveVideo={handleSaveVideo}
         />
+      )}
+
+      {/* History Detail Modal Overlay */}
+      {selectedHistoryLog && (
+        <div className="modal-overlay" style={{ zIndex: 10001 }} onClick={() => setSelectedHistoryLog(null)}>
+          <div 
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              padding: "20px", 
+              borderRadius: "16px", 
+              width: "calc(100% - 32px)", 
+              maxWidth: "460px",
+              maxHeight: "80vh",
+              display: "flex",
+              flexDirection: "column",
+              margin: "auto 16px"
+            }}
+          >
+            <div className="modal-header" style={{ padding: "0 0 16px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px", textAlign: "left" }}>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: "800", color: "white", margin: 0 }}>
+                  {selectedHistoryLog.workoutName || "Custom Workout"}
+                </h3>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                  {getFriendlyDate(selectedHistoryLog.date)}
+                </span>
+              </div>
+              <button 
+                className="close-btn" 
+                onClick={() => setSelectedHistoryLog(null)} 
+                style={{ fontSize: "1.8rem", margin: 0, padding: 0 }}
+              >
+                &times;
+              </button>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", background: "rgba(255,255,255,0.02)", padding: "12px", borderRadius: "10px", margin: "12px 0 16px 0", border: "1px solid var(--border-color)" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
+                <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "4px" }}>DURATION</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: "700", color: "white" }}>
+                  ⏱️ {Math.round(selectedHistoryLog.duration / 60)} min
+                </span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, borderLeft: "1px solid var(--border-color)", borderRight: "1px solid var(--border-color)" }}>
+                <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "4px" }}>EXERCISES</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: "700", color: "white" }}>
+                  💪 {selectedHistoryLog.exerciseCount} Done
+                </span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
+                <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "4px" }}>CALORIES</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: "700", color: "var(--accent-neon)" }}>
+                  🔥 {selectedHistoryLog.calories !== undefined ? selectedHistoryLog.calories : Math.round((selectedHistoryLog.duration / 60) * 6.5)} kcal
+                </span>
+              </div>
+            </div>
+
+            <h4 style={{ fontSize: "0.88rem", fontWeight: "700", color: "white", margin: "0 0 10px 0", textTransform: "uppercase", letterSpacing: "0.05em", textAlign: "left" }}>
+              Exercises Completed
+            </h4>
+            
+            <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "8px" }}>
+              {selectedHistoryLog.exercises && selectedHistoryLog.exercises.map((ex, idx) => (
+                <div 
+                  key={idx} 
+                  style={{ 
+                    display: "flex", 
+                    justifyContent: "space-between", 
+                    alignItems: "center", 
+                    padding: "10px 12px", 
+                    borderRadius: "8px", 
+                    background: "rgba(255,255,255,0.01)", 
+                    border: "1px solid var(--border-color)" 
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: "2px", textAlign: "left" }}>
+                    <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "white" }}>{ex.name}</span>
+                    <span style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>{ex.target}</span>
+                  </div>
+                  <span style={{ fontSize: "0.8rem", color: "var(--accent-neon)", fontWeight: "600" }}>
+                    {ex.duration > 0 ? `${ex.sets} sets x ${ex.duration}s` : `${ex.sets} sets x ${ex.reps} reps`}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => setSelectedHistoryLog(null)} 
+              style={{ marginTop: "16px", width: "100%" }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Preset Loading overlay */}
@@ -783,96 +1040,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Creator Footer */}
-      <footer style={{
-        padding: "18px 20px 90px", // 90px bottom padding clears the sticky BottomNav
-        textAlign: "center",
-        borderTop: "1px solid var(--border-color)",
-        marginTop: "8px"
-      }}>
-        <p style={{ margin: "0 0 6px 0", fontSize: "0.7rem", color: "var(--text-muted)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-          Crafted with 💪 by - Priyajit
-        </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap" }}>
-          {/* LinkedIn */}
-          <a
-            href="https://www.linkedin.com/in/n-priyajit/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "7px",
-              textDecoration: "none",
-              padding: "6px 14px",
-              borderRadius: "999px",
-              border: "1px solid rgba(0, 119, 181, 0.4)",
-              background: "rgba(0, 119, 181, 0.08)",
-              transition: "var(--transition-smooth)"
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = "rgba(0, 119, 181, 0.18)";
-              e.currentTarget.style.borderColor = "rgba(0, 119, 181, 0.7)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = "rgba(0, 119, 181, 0.08)";
-              e.currentTarget.style.borderColor = "rgba(0, 119, 181, 0.4)";
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#0077B5">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-            </svg>
-            <span style={{ fontSize: "0.82rem", fontWeight: "700", color: "#60b8e0", letterSpacing: "0.01em" }}>
-              LinkedIn
-            </span>
-          </a>
 
-          {/* Instagram */}
-          <a
-            href="https://www.instagram.com/_npriyajit/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "7px",
-              textDecoration: "none",
-              padding: "6px 14px",
-              borderRadius: "999px",
-              border: "1px solid rgba(225, 48, 108, 0.4)",
-              background: "rgba(225, 48, 108, 0.08)",
-              transition: "var(--transition-smooth)"
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = "rgba(225, 48, 108, 0.18)";
-              e.currentTarget.style.borderColor = "rgba(225, 48, 108, 0.7)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = "rgba(225, 48, 108, 0.08)";
-              e.currentTarget.style.borderColor = "rgba(225, 48, 108, 0.4)";
-            }}
-          >
-            {/* Instagram gradient icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="url(#ig-grad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <defs>
-                <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#f09433" />
-                  <stop offset="25%" stopColor="#e6683c" />
-                  <stop offset="50%" stopColor="#dc2743" />
-                  <stop offset="75%" stopColor="#cc2366" />
-                  <stop offset="100%" stopColor="#bc1888" />
-                </linearGradient>
-              </defs>
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-              <circle cx="12" cy="12" r="4" />
-              <circle cx="17.5" cy="6.5" r="0.5" fill="url(#ig-grad)" stroke="none" />
-            </svg>
-            <span style={{ fontSize: "0.82rem", fontWeight: "700", color: "#e1306c", letterSpacing: "0.01em" }}>
-              Instagram
-            </span>
-          </a>
-        </div>
-      </footer>
 
       {/* Mobile Sticky Navigation Tabs */}
       <BottomNav

@@ -77,12 +77,15 @@ export const saveHistory = (history) => {
   localStorage.setItem(KEYS.HISTORY, JSON.stringify(history));
 };
 
-export const logCompletedWorkout = (routine, durationSeconds) => {
+export const logCompletedWorkout = (routine, durationSeconds, workoutName) => {
   const history = getHistory();
+  const estCalories = Math.round((durationSeconds / 60) * 6.5); // Average 6.5 cals/min
   const logEntry = {
     id: `log-${Date.now()}`,
     date: new Date().toISOString(),
     duration: durationSeconds,
+    calories: estCalories,
+    workoutName: workoutName || "Custom Workout",
     exerciseCount: routine.length,
     exercises: routine.map(e => ({
       name: e.name,

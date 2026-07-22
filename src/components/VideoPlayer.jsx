@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-export default function VideoPlayer({ exercise, onClose }) {
+export default function VideoPlayer({ exercise, onClose, onSaveVideo }) {
   if (!exercise) return null;
 
-  const { name, videoUrl, searchQuery } = exercise;
+  const { id, name, videoUrl, searchQuery } = exercise;
+  
+  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [inputUrl, setInputUrl] = useState(videoUrl || "");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    setInputUrl(videoUrl || "");
+  }, [videoUrl]);
 
   // Helper to extract YouTube ID
   const getYouTubeEmbedUrl = (url) => {
@@ -96,6 +104,107 @@ export default function VideoPlayer({ exercise, onClose }) {
               <p>Search standard form guides on YouTube or add your own video link via the edit button.</p>
             </div>
           )}
+
+          {/* Direct Linking Form */}
+          <div style={{ marginTop: "16px", padding: "12px", borderRadius: "8px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-color)", textAlign: "left" }}>
+            {!showLinkForm ? (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                  {videoUrl ? "Linked video reference active." : "No custom video linked yet."}
+                </span>
+                <button
+                  onClick={() => setShowLinkForm(true)}
+                  style={{
+                    padding: "6px 12px",
+                    borderRadius: "6px",
+                    border: "1px solid var(--accent-neon)",
+                    background: "none",
+                    color: "var(--accent-neon)",
+                    fontWeight: "700",
+                    fontSize: "0.75rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  {videoUrl ? "Change Video Link" : "Link Video"}
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "0.8rem", fontWeight: "700", color: "white" }}>
+                  Paste YouTube or Video URL:
+                </label>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input
+                    type="text"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={inputUrl}
+                    onChange={(e) => setInputUrl(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: "8px 10px",
+                      borderRadius: "6px",
+                      background: "var(--bg-primary)",
+                      border: "1px solid var(--border-color)",
+                      color: "white",
+                      fontSize: "0.8rem",
+                      boxSizing: "border-box"
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (!inputUrl.trim()) {
+                        setErrorMsg("Please enter a URL");
+                        return;
+                      }
+                      try {
+                        new URL(inputUrl.trim());
+                      } catch (_) {
+                        setErrorMsg("Invalid URL. Include http:// or https://");
+                        return;
+                      }
+                      setErrorMsg("");
+                      onSaveVideo(id, inputUrl.trim());
+                      setShowLinkForm(false);
+                    }}
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: "6px",
+                      border: "none",
+                      background: "var(--accent-neon)",
+                      color: "#090d16",
+                      fontWeight: "700",
+                      fontSize: "0.8rem",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowLinkForm(false);
+                      setErrorMsg("");
+                    }}
+                    style={{
+                      padding: "8px 10px",
+                      borderRadius: "6px",
+                      border: "1px solid var(--border-color)",
+                      background: "none",
+                      color: "var(--text-muted)",
+                      fontSize: "0.8rem",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+                {errorMsg && (
+                  <span style={{ fontSize: "0.72rem", color: "var(--accent-danger)" }}>
+                    {errorMsg}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
           <div className="search-assistance">
             <p className="search-tip">Want to see professional trainers perform this?</p>
