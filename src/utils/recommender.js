@@ -77,7 +77,7 @@ export const generateRecommendation = ({ muscles, equipment, duration, level }) 
   };
 
   // If no muscles selected, assume full body (all muscle groups)
-  const targetMuscles = muscles.length > 0 ? muscles : ["Chest", "Back", "Shoulders", "Legs", "Arms", "Core"];
+  const targetMuscles = muscles.length > 0 ? muscles : ["Chest", "Back", "Shoulders", "Legs", "Biceps", "Triceps", "Core"];
 
   // 4. Filter and select Warmups
   const warmups = compatibleExercises.filter(ex => ex.category === "warmup");
