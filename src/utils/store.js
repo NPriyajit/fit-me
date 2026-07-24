@@ -9,8 +9,19 @@ const KEYS = {
 };
 
 export const getPreferences = () => {
-  const data = localStorage.getItem(KEYS.PREFERENCES);
-  return data ? JSON.parse(data) : {
+  try {
+    const data = localStorage.getItem(KEYS.PREFERENCES);
+    const parsed = data ? JSON.parse(data) : null;
+    if (parsed && typeof parsed === "object") {
+      return {
+        muscles: Array.isArray(parsed.muscles) ? parsed.muscles : [],
+        equipment: parsed.equipment || "gym",
+        level: parsed.level || "beginner",
+        duration: parsed.duration || 30
+      };
+    }
+  } catch (e) {}
+  return {
     muscles: [],
     equipment: "gym",
     level: "beginner",
@@ -23,8 +34,13 @@ export const savePreferences = (preferences) => {
 };
 
 export const getCustomExercises = () => {
-  const data = localStorage.getItem(KEYS.CUSTOM_EXERCISES);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(KEYS.CUSTOM_EXERCISES);
+    const parsed = data ? JSON.parse(data) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
 };
 
 export const saveCustomExercises = (exercises) => {
@@ -60,8 +76,13 @@ export const deleteCustomExercise = (id) => {
 };
 
 export const getCurrentRoutine = () => {
-  const data = localStorage.getItem(KEYS.CURRENT_ROUTINE);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(KEYS.CURRENT_ROUTINE);
+    const parsed = data ? JSON.parse(data) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
 };
 
 export const saveCurrentRoutine = (routine) => {
@@ -69,8 +90,13 @@ export const saveCurrentRoutine = (routine) => {
 };
 
 export const getHistory = () => {
-  const data = localStorage.getItem(KEYS.HISTORY);
-  return data ? JSON.parse(data) : [];
+  try {
+    const data = localStorage.getItem(KEYS.HISTORY);
+    const parsed = data ? JSON.parse(data) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
 };
 
 export const saveHistory = (history) => {
@@ -101,8 +127,13 @@ export const logCompletedWorkout = (routine, durationSeconds, workoutName) => {
 };
 
 export const getExerciseOverrides = () => {
-  const data = localStorage.getItem(KEYS.OVERRIDES);
-  return data ? JSON.parse(data) : {};
+  try {
+    const data = localStorage.getItem(KEYS.OVERRIDES);
+    const parsed = data ? JSON.parse(data) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (e) {
+    return {};
+  }
 };
 
 export const saveExerciseOverride = (id, fields) => {

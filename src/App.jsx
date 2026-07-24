@@ -285,7 +285,9 @@ export default function App() {
   };
 
   const getFriendlyDate = (isoString) => {
+    if (!isoString) return "Unknown Date";
     const date = new Date(isoString);
+    if (isNaN(date.getTime())) return "Unknown Date";
     const now = new Date();
     
     const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
